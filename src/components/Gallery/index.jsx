@@ -70,13 +70,27 @@ function PhotoGrid({ photos }) {
         return (
           <div className={styles.col} key={photo.id}>
             <div className={styles.thumb}>
-              <img src={photo.urls.thumb} />
+              <Image src={photo.urls.thumb} color={photo.color} />
             </div>
           </div>
         );
       })}
     </div>
   );
+}
+
+function Image(props) {
+  const [loaded, setLoaded] = useState(false);
+  return [
+    <img onLoad={() => setLoaded(true)} {...props} />,
+    <div
+      className={styles.imgPlaceholder}
+      style={{
+        backgroundColor: props.color,
+        opacity: loaded ? 0 : 1
+      }}
+    />
+  ];
 }
 
 export default Gallery;
