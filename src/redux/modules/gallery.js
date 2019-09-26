@@ -1,4 +1,23 @@
+import { combineReducers } from "redux";
 import qs from "querystring";
+
+const SELECT_MODE = "SELECT_MODE";
+
+export function selectMode(mode) {
+  return {
+    type: SELECT_MODE,
+    mode
+  };
+}
+
+function selectedMode(state = "all", action) {
+  switch (action.type) {
+    case SELECT_MODE:
+      return action.mode;
+    default:
+      return state;
+  }
+}
 
 export const loadingStatus = {
   loading: -2,
@@ -8,105 +27,75 @@ export const loadingStatus = {
 };
 
 const initialState = {
-  page: 1,
-  name: "",
+  page: 0,
   photos: [],
-  status: loadingStatus.continue
+  status: loadingStatus.continue,
+  params: {}
 };
 
-const SET_NAME = "SET_NAME";
-const ADD_PHOTOS = "ADD_PHOTOS";
-const SET_PHOTOS = "SET_PHOTOS";
-const SET_PAGE = "SET_PAGE";
-const SET_STATUS = "SET_STATUS";
+const INIT_GALLERY = "INIT_GALLERY";
 const REQUEST_PHOTOS = "REQUEST_PHOTOS";
 const RECEIVE_PHOTOS = "RECEIVE_PHOTOS";
 
-export function setStatus(status) {
+export function initGallery(name) {
   return {
-    type: SET_STATUS,
-    status
-  };
-}
-export function setPage(page) {
-  return {
-    type: SET_PAGE,
-    page
-  };
-}
-
-export function setName(name) {
-  return {
-    type: SET_NAME,
+    type: INIT_GALLERY,
     name
   };
 }
 
-export function addPhotos(photoArray) {
+export function requestPhotos(name) {
   return {
-    type: ADD_PHOTOS,
-    photoArray
+    type: REQUEST_PHOTOS,
+    name
   };
 }
 
-export function setPhotos(photoArray) {
-  return {
-    type: SET_PHOTOS,
-    photoArray
-  };
-}
-
-export function requestPhotos() {
-  return {
-    type: REQUEST_PHOTOS
-  };
-}
-
-export function receivePhotos(photoArray) {
+export function receivePhotos(name, photoArray) {
   return {
     type: RECEIVE_PHOTOS,
+    name,
     photoArray
   };
 }
 
-// let counter = 0;
-const photosApiUrl = "https://api.unsplash.com/photos";
+let counter = 0;
+const url = "https://api.unsplash.com";
+const api = {
+  all: { path: "/photos", shape: i => i },
+  search: { path: "/search/photos", shape: i => i.results }
+};
 export function fetchPhotos(params) {
-  return async dispatch => {
+  return async (dispatch, getState) => {
+    const { selectedMode: mode } = getState().gallery;
+    const name = mode === "all" ? mode : params.query;
     console.log("fetching");
-    dispatch(requestPhotos());
-
+    dispatch(requestPhotos(name));
+    const { page, params: params2 } = getState().gallery.galleries[name];
+    params = { ...params2, ...params, page };
     try {
-      const res = await fetch(`${photosApiUrl}?${qs.encode(params)}`);
+      const res = await fetch(`${url}${api[mode].path}/?${qs.encode(params)}`);
       const data = await res.json();
-      dispatch(receivePhotos(data));
+      dispatch(receivePhotos(name, api[mode].shape(data)));
       // dispatch(
       //   receivePhotos(
+      //     name,
       //     Array(12)
       //       .fill({})
       //       .map(a => ({
-      //         id: counter++
+      //         id: counter++,
+      //         urls: { thumb: null }
       //       }))
       //   )
       // );
     } catch (error) {
-      alert("WTFFF!");
+      alert("ERRO ERRO");
     }
   };
 }
 
-export default function reducer(state = initialState, action) {
+function gallery(state = initialState, action) {
   switch (action.type) {
-    case SET_NAME:
-      return { ...state, name: action.name };
-    case SET_PHOTOS:
-      return { ...state, photos: [...action.photoArray] };
-    case ADD_PHOTOS:
-      return { ...state, photos: [...state.photos, ...action.photoArray] };
-    case SET_PAGE:
-      return { ...state, page: action.page };
-    case SET_STATUS:
-      return { ...state, status: action.status };
     case REQUEST_PHOTOS:
       return { ...state, page: state.page + 1, status: loadingStatus.loading };
     case RECEIVE_PHOTOS:
@@ -115,7 +104,32 @@ export default function reducer(state = initialState, action) {
         status: loadingStatus.continue,
         photos: [...state.photos, ...action.photoArray]
       };
+    case INIT_GALLERY:
     default:
       return state;
   }
 }
+
+function galleries(
+  state = {
+    all: gallery(undefined, {})
+  },
+  action
+) {
+  switch (action.type) {
+    case INIT_GALLERY:
+    case REQUEST_PHOTOS:
+    case RECEIVE_PHOTOS:
+      return {
+        ...state,
+        [action.name]: gallery(state[action.name], action)
+      };
+    default:
+      return state;
+  }
+}
+
+export default combineReducers({
+  selectedMode,
+  galleries
+});

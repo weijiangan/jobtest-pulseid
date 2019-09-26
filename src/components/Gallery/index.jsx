@@ -1,63 +1,92 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { debounce } from "lodash";
 import { loadingStatus } from "../../redux/modules/gallery";
 import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
+import { useDebounce } from "../../hooks/useDebounce";
 import config from "../../../config";
 import styles from "./styles.css";
 
+const sortOptions = ["latest", "oldest", "popular"];
+const SEARCH_DB_TIMEOUT = 500;
+const INFINITE_DB_TIMEOUT = 75;
+
 function Gallery({ gallery, ...props }) {
+  const [query, setQuery] = useState("");
+  const debouncedQuery = useDebounce(query, SEARCH_DB_TIMEOUT);
+  const galleryName = gallery.selectedMode === "all" ? "all" : debouncedQuery;
+  let selectedGallery = gallery.galleries[galleryName];
+  if (!selectedGallery) {
+    selectedGallery = {};
+    props.initGallery(debouncedQuery);
+  }
+
   const params = {
     client_id: config.clientId,
-    page: gallery.page,
     per_page: 12,
-    order_by: "latest"
+    query: debouncedQuery || undefined
   };
 
-  const nextPage = useMemo(
-    () =>
-      // scroll events fire very often and sometimes state doesn't update
-      // quick enough
-      debounce(() => props.fetchPhotos(params), 500, {
-        leading: true,
-        trailing: false
-      }),
-    [props.fetchPhotos, params]
+  const nextPage = useCallback(
+    // scroll events fire very often and sometimes component doesn't rerender
+    // quick enough to receive new prop for loading status
+    debounce(props.fetchPhotos, INFINITE_DB_TIMEOUT, {
+      leading: true,
+      trailing: false
+    }),
+    [props.fetchPhotos]
   );
 
   useInfiniteScroll(
-    { isLoading: gallery.status !== loadingStatus.continue },
+    { isLoading: selectedGallery.status !== loadingStatus.continue },
     () => nextPage(params)
   );
 
-  // fetch first photos
+  const dbSelectMode = useCallback(
+    debounce(props.selectMode, SEARCH_DB_TIMEOUT),
+    []
+  );
+
+  const handleSearch = useCallback(event => {
+    setQuery(event.target.value);
+    dbSelectMode("search");
+  });
+
   useEffect(() => {
-    nextPage(params);
-  }, []);
-
-  const [query, setQuery] = useState("");
-
-  // for larger screens if the pictures don't fill the screen, keep loading
-  // more photos
-  const cantScroll = document.body.scrollHeight < window.innerHeight;
-  if (
-    gallery.page > 1 &&
-    cantScroll &&
-    gallery.status === loadingStatus.continue
-  ) {
-    nextPage(params);
-  }
+    const cantScroll = document.body.scrollHeight < window.innerHeight;
+    if (cantScroll && selectedGallery.status === loadingStatus.continue) {
+      if (props.selectedMode === "search" && !debouncedQuery) return;
+      console.log("aaa");
+      props.fetchPhotos(params);
+    }
+  });
 
   return (
     <div>
       <div className={styles.container}>
-        <input
-          value={gallery.name}
-          placeholder="Search images..."
-          onChange={e => e.target.value}
-        />
+        <div style={{ margin: "1.5rem 0", display: "flex" }}>
+          <div style={{ flex: "1 0 auto" }}>
+            <input
+              type="text"
+              value={query}
+              onChange={handleSearch}
+              placeholder="Search images..."
+            />{" "}
+            {debouncedQuery}
+          </div>
+          <div>
+            <span style={{ marginRight: "0.5rem" }}>Sort by </span>
+            <select>
+              {sortOptions.map(option => (
+                <option key={option} value={option.toLowerCase()}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
       <div className={styles.container}>
-        <PhotoGrid photos={gallery.photos} />
+        <PhotoGrid photos={selectedGallery.photos || []} />
       </div>
     </div>
   );

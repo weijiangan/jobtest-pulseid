@@ -1,29 +1,18 @@
 import { connect } from "react-redux";
-import {
-  setName,
-  setPhotos,
-  addPhotos,
-  setPage,
-  setStatus,
-  fetchPhotos
-} from "../redux/modules/gallery";
+import { initGallery, fetchPhotos, selectMode } from "../redux/modules/gallery";
 import AuthScreen from "../components/Gallery";
 
 function mapStateToProps(state) {
   return {
-    gallery: state.gallery,
-    app: state.app
+    gallery: state.gallery
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    example: arg => dispatch(setName(arg)),
-    setPhotos: arr => dispatch(setPhotos(arr)),
-    addPhotos: arr => dispatch(addPhotos(arr)),
-    setPage: page => dispatch(setPage(page)),
-    setStatus: s => dispatch(setStatus(s)),
-    fetchPhotos: p => dispatch(fetchPhotos(p))
+    initGallery: n => dispatch(initGallery(n)),
+    fetchPhotos: p => dispatch(fetchPhotos(p)),
+    selectMode: m => dispatch(selectMode(m))
   };
 }
 
