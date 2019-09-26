@@ -12,7 +12,7 @@ const INFINITE_DB_TIMEOUT = 75;
 
 function Gallery({ gallery, ...props }) {
   const [query, setQuery] = useState("");
-  const debouncedQuery = useDebounce(query, SEARCH_DB_TIMEOUT);
+  const [debouncedQuery, setDbQuery] = useDebounce(query, SEARCH_DB_TIMEOUT);
   const galleryName = gallery.selectedMode === "all" ? "all" : debouncedQuery;
   let selectedGallery = gallery.galleries[galleryName];
   if (!selectedGallery) {
