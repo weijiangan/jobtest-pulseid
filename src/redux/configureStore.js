@@ -1,6 +1,5 @@
 import thunkMiddleware from "redux-thunk";
 import { createStore, applyMiddleware, compose, combineReducers } from "redux";
-import app from "./modules/app";
 import gallery from "./modules/gallery";
 
 const reducer = combineReducers({
