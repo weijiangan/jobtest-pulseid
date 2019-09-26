@@ -61,36 +61,38 @@ function Gallery({ gallery, ...props }) {
     }
   }, [selectedGallery]);
 
+  const sortSelect = (
+    <div className={styles.flexFixed}>
+      <span className={styles.mr1}>Sort by </span>
+      <select
+        value={gallery.galleries.all.params.order_by}
+        onChange={e => props.setAllOrder(e.target.value)}
+      >
+        {sortOptions.map(option => (
+          <option key={option} value={option.toLowerCase()}>
+            {option}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+
   return (
     <div>
-      <div className={styles.container}>
-        <div className={styles.topBar}>
+      <div className={styles.topBar}>
+        <div className={styles.container}>
           <input
-            className={styles.mb1}
+            className={styles.searchBox}
             type="text"
             value={query}
             onChange={handleSearch}
             placeholder="Search images..."
           />
-          <div className={styles.flexCenter}>
+          <div className={styles.flexBaseline}>
             <div className={styles.navWrapper}>
               <NavContainer query={debouncedQuery} setQuery={setDbQuery} />
             </div>
-            {gallery.selectedMode === "all" && (
-              <div className={styles.flexFixed}>
-                <span className={styles.mr1}>Sort by </span>
-                <select
-                  value={gallery.galleries.all.params.order_by}
-                  onChange={e => props.setAllOrder(e.target.value)}
-                >
-                  {sortOptions.map(option => (
-                    <option key={option} value={option.toLowerCase()}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+            {gallery.selectedMode === "all" && sortSelect}
           </div>
         </div>
       </div>

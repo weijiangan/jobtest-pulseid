@@ -61,7 +61,7 @@ input[type="text"]:focus:hover {
 
 .topBar {
   width: 100%;
-  padding: 1rem 1.5rem 0 1.5rem;
+  padding-top: 1rem;
   position: fixed;
   top: 0;
   left: 0;
@@ -85,16 +85,18 @@ input[type="text"]:focus:hover {
   display: flex;
 }
 
-.alignItemsCenter {
-  align-items: center;
+.alignItemsBaseline {
+  align-items: baseline;
 }
 
-.flexCenter {
-  composes: flex alignItemsCenter;
+.flexBaseline {
+  composes: flex alignItemsBaseline;
 }
 
 .flexFixed {
   flex: 0 0 auto;
+  padding-left: 0.5rem;
+  border-left: 1px solid #dfdfdf;
 }
 
 .mb1 {
@@ -103,4 +105,19 @@ input[type="text"]:focus:hover {
 
 .mr1 {
   margin-right: 0.5rem;
+}
+
+.searchBox {
+  composes: mb1;
+}
+
+@media (max-width: 575.98px) {
+  .container {
+    padding: 0 1rem;
+  }
+
+  input[type="text"].searchBox {
+    width: 100%;
+    border-radius: 0.875rem;
+  }
 }
