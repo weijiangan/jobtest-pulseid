@@ -70,7 +70,7 @@ function PhotoGrid({ photos }) {
         return (
           <div className={styles.col} key={photo.id}>
             <div className={styles.thumb}>
-              <Image src={photo.urls.thumb} color={photo.color} />
+              <Image src={photo.urls.small} color={photo.color} />
             </div>
           </div>
         );
