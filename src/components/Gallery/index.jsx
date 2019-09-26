@@ -81,16 +81,18 @@ function PhotoGrid({ photos }) {
 
 function Image(props) {
   const [loaded, setLoaded] = useState(false);
-  return [
-    <img onLoad={() => setLoaded(true)} {...props} />,
-    <div
-      className={styles.imgPlaceholder}
-      style={{
-        backgroundColor: props.color,
-        opacity: loaded ? 0 : 1
-      }}
-    />
-  ];
+  return (
+    <>
+      <img onLoad={() => setLoaded(true)} {...props} />
+      <div
+        className={styles.imgPlaceholder}
+        style={{
+          backgroundColor: props.color,
+          opacity: loaded ? 0 : 1
+        }}
+      />
+    </>
+  );
 }
 
 export default Gallery;
