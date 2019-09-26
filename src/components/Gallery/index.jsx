@@ -54,11 +54,10 @@ function Gallery({ gallery, ...props }) {
   useEffect(() => {
     const cantScroll = document.body.scrollHeight < window.innerHeight;
     if (cantScroll && selectedGallery.status === loadingStatus.continue) {
-      if (props.selectedMode === "search" && !debouncedQuery) return;
-      console.log("aaa");
+      if (gallery.selectedMode === "search" && debouncedQuery === "") return;
       props.fetchPhotos(params);
     }
-  });
+  }, [selectedGallery]);
 
   return (
     <div>
