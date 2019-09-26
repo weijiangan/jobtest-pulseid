@@ -1,5 +1,10 @@
 import { connect } from "react-redux";
-import { initGallery, fetchPhotos, selectMode } from "../redux/modules/gallery";
+import {
+  initGallery,
+  fetchPhotos,
+  selectMode,
+  setAllOrder
+} from "../redux/modules/gallery";
 import AuthScreen from "../components/Gallery";
 
 function mapStateToProps(state) {
@@ -12,7 +17,8 @@ function mapDispatchToProps(dispatch) {
   return {
     initGallery: n => dispatch(initGallery(n)),
     fetchPhotos: p => dispatch(fetchPhotos(p)),
-    selectMode: m => dispatch(selectMode(m))
+    selectMode: m => dispatch(selectMode(m)),
+    setAllOrder: o => dispatch(setAllOrder(o))
   };
 }
 

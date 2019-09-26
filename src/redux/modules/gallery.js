@@ -37,6 +37,14 @@ const initialState = {
 const INIT_GALLERY = "INIT_GALLERY";
 const REQUEST_PHOTOS = "REQUEST_PHOTOS";
 const RECEIVE_PHOTOS = "RECEIVE_PHOTOS";
+const SET_ALL_ORDER = "SET_ALL_ORDER";
+
+export function setAllOrder(order) {
+  return {
+    type: SET_ALL_ORDER,
+    order
+  };
+}
 
 export function initGallery(name) {
   return {
@@ -118,6 +126,16 @@ function galleries(
       return {
         ...state,
         [action.name]: gallery(state[action.name], action)
+      };
+    case SET_ALL_ORDER:
+      return {
+        ...state,
+        all: {
+          ...state.all,
+          params: { order_by: action.order },
+          photos: [],
+          page: 0
+        }
       };
     default:
       return state;

@@ -62,29 +62,30 @@ function Gallery({ gallery, ...props }) {
   return (
     <div>
       <div className={styles.container}>
-        <div style={{ margin: "1.5rem 0", display: "flex" }}>
+        <div className={styles.topBar}>
           <div style={{ flex: "1 0 auto" }}>
             <input
               type="text"
               value={query}
               onChange={handleSearch}
               placeholder="Search images..."
-            />{" "}
-            {debouncedQuery}
+            />
           </div>
-          <div>
-            <span style={{ marginRight: "0.5rem" }}>Sort by </span>
-            <select>
-              {sortOptions.map(option => (
-                <option key={option} value={option.toLowerCase()}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </div>
+          {gallery.selectedMode === "all" && (
+            <div>
+              <span style={{ marginRight: "0.5rem" }}>Sort by </span>
+              <select onChange={e => props.setAllOrder(e.target.value)}>
+                {sortOptions.map(option => (
+                  <option key={option} value={option.toLowerCase()}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
       </div>
-      <div className={styles.container}>
+      <div className={styles.container} style={{ marginTop: "5rem" }}>
         <PhotoGrid photos={selectedGallery.photos || []} />
       </div>
     </div>
