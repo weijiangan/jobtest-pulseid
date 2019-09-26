@@ -1,5 +1,6 @@
 import { combineReducers } from "redux";
 import qs from "querystring";
+import { debugLog } from "../../utils";
 
 const SELECT_MODE = "SELECT_MODE";
 
@@ -59,36 +60,30 @@ export function receivePhotos(name, photoArray) {
   };
 }
 
-let counter = 0;
 const url = "https://api.unsplash.com";
 const api = {
   all: { path: "/photos", shape: i => i },
   search: { path: "/search/photos", shape: i => i.results }
 };
+
 export function fetchPhotos(params) {
   return async (dispatch, getState) => {
     const { selectedMode: mode } = getState().gallery;
     const name = mode === "all" ? mode : params.query;
-    console.log("fetching");
+
+    debugLog("fetching");
     dispatch(requestPhotos(name));
+
     const { page, params: params2 } = getState().gallery.galleries[name];
     params = { ...params2, ...params, page };
+
     try {
+      debugLog(`${url}${api[mode].path}/?${qs.encode(params)}`);
       const res = await fetch(`${url}${api[mode].path}/?${qs.encode(params)}`);
       const data = await res.json();
       dispatch(receivePhotos(name, api[mode].shape(data)));
-      // dispatch(
-      //   receivePhotos(
-      //     name,
-      //     Array(12)
-      //       .fill({})
-      //       .map(a => ({
-      //         id: counter++,
-      //         urls: { thumb: null }
-      //       }))
-      //   )
-      // );
     } catch (error) {
+      console.log(error);
       alert("ERRO ERRO");
     }
   };
