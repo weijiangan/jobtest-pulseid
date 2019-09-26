@@ -37,6 +37,7 @@ const initialState = {
 const INIT_GALLERY = "INIT_GALLERY";
 const REQUEST_PHOTOS = "REQUEST_PHOTOS";
 const RECEIVE_PHOTOS = "RECEIVE_PHOTOS";
+const FETCH_ERROR = "FETCH_ERROR";
 const SET_ALL_ORDER = "SET_ALL_ORDER";
 
 export function setAllOrder(order) {
@@ -68,6 +69,13 @@ export function receivePhotos(name, photoArray) {
   };
 }
 
+export function fetchError(name) {
+  return {
+    type: FETCH_ERROR,
+    name
+  };
+}
+
 const url = "https://api.unsplash.com";
 const api = {
   all: { path: "/photos", shape: i => i },
@@ -91,6 +99,7 @@ export function fetchPhotos(params) {
       const data = await res.json();
       dispatch(receivePhotos(name, api[mode].shape(data)));
     } catch (error) {
+      dispatch(fetchError(name));
       console.log(error);
       alert("ERRO ERRO");
     }
@@ -107,6 +116,8 @@ function gallery(state = initialState, action) {
         status: loadingStatus.continue,
         photos: [...state.photos, ...action.photoArray]
       };
+    case FETCH_ERROR:
+      return { ...state, page: state.page - 1, status: loadingStatus.error };
     case INIT_GALLERY:
     default:
       return state;
