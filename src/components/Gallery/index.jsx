@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { debounce } from "lodash";
+import PhotoGrid from "../PhotoGrid";
+import NavContainer from "../../containers/NavContainer";
 import { loadingStatus } from "../../redux/modules/gallery";
 import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
 import { useDebounce } from "../../hooks/useDebounce";
@@ -63,64 +65,42 @@ function Gallery({ gallery, ...props }) {
     <div>
       <div className={styles.container}>
         <div className={styles.topBar}>
-          <div style={{ flex: "1 0 auto" }}>
-            <input
-              type="text"
-              value={query}
-              onChange={handleSearch}
-              placeholder="Search images..."
-            />
-          </div>
-          {gallery.selectedMode === "all" && (
-            <div>
-              <span style={{ marginRight: "0.5rem" }}>Sort by </span>
-              <select onChange={e => props.setAllOrder(e.target.value)}>
-                {sortOptions.map(option => (
-                  <option key={option} value={option.toLowerCase()}>
-                    {option}
-                  </option>
-                ))}
-              </select>
+          <input
+            className={styles.mb1}
+            type="text"
+            value={query}
+            onChange={handleSearch}
+            placeholder="Search images..."
+          />
+          <div className={styles.flexCenter}>
+            <div className={styles.navWrapper}>
+              <NavContainer query={debouncedQuery} setQuery={setDbQuery} />
             </div>
-          )}
+            {gallery.selectedMode === "all" && (
+              <div className={styles.flexFixed}>
+                <span className={styles.mr1}>Sort by </span>
+                <select
+                  value={gallery.galleries.all.params.order_by}
+                  onChange={e => props.setAllOrder(e.target.value)}
+                >
+                  {sortOptions.map(option => (
+                    <option key={option} value={option.toLowerCase()}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-      <div className={styles.container} style={{ marginTop: "5rem" }}>
+      <div className={styles.container} style={{ marginTop: "7.15rem" }}>
         <PhotoGrid photos={selectedGallery.photos || []} />
       </div>
+      {selectedGallery.status === loadingStatus.loading && (
+        <div className={styles.loadingArea}>Loading...</div>
+      )}
     </div>
-  );
-}
-
-function PhotoGrid({ photos }) {
-  return (
-    <div className={styles.row}>
-      {photos.map(photo => {
-        return (
-          <div className={styles.col} key={photo.id}>
-            <div className={styles.thumb}>
-              <Image src={photo.urls.small} color={photo.color} />
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function Image(props) {
-  const [loaded, setLoaded] = useState(false);
-  return (
-    <>
-      <img onLoad={() => setLoaded(true)} {...props} />
-      <div
-        className={styles.imgPlaceholder}
-        style={{
-          backgroundColor: props.color,
-          opacity: loaded ? 0 : 1
-        }}
-      />
-    </>
   );
 }
 
