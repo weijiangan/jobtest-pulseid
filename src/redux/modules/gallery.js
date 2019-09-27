@@ -20,6 +20,7 @@ function selectedMode(state = "all", action) {
   }
 }
 
+// only load if > 0
 export const loadingStatus = {
   loading: -2,
   error: -1,
