@@ -7,7 +7,7 @@ function Nav({ query, setQuery, gallery, ...props }) {
   const { selectedMode } = gallery;
 
   return (
-    <ul className={styles.nav}>
+    <ul className={styles.nav} data-testid="entries">
       <li className={selectedMode === "all" ? styles.active : undefined}>
         <button type="button" onClick={() => props.selectMode("all")}>
           All

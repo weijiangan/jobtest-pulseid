@@ -3,7 +3,7 @@ import styles from "./styles.css";
 
 function PhotoGrid({ photos }) {
   return (
-    <div className={styles.row}>
+    <div className={styles.row} data-testid="grid">
       {photos.map(photo => {
         return (
           <div className={styles.col} key={photo.id}>
@@ -17,7 +17,7 @@ function PhotoGrid({ photos }) {
   );
 }
 
-function Image(props) {
+export function Image(props) {
   const [loaded, setLoaded] = useState(false);
   return (
     <>

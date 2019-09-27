@@ -2,7 +2,7 @@ import thunkMiddleware from "redux-thunk";
 import { createStore, applyMiddleware, compose, combineReducers } from "redux";
 import gallery from "./modules/gallery";
 
-const reducer = combineReducers({
+export const reducer = combineReducers({
   gallery
 });
 
