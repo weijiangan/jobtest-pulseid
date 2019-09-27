@@ -2,7 +2,7 @@
 
 Link to demo: https://epic-dubinsky-908725.netlify.com/
 
-A client to Unsplash API written in React 16.9 with Hooks and redux-thunk.
+A client to Unsplash API written in React 16.9 with Hooks and redux-thunk. This is an assignment I did for Pulse iD's job interview. It incorporates a basic set of features as seen in Unsplash including browsing photos, searching and narrow down by a subset of predefined tags, complete with infinite scrolling pagination mechanism.
 
 I took this opportunity to learn the Redux ducks pattern and to test my front end behavior with react-testing-library.
 
