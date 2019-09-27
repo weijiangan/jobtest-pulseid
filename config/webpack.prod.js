@@ -35,7 +35,15 @@ module.exports = {
                 [
                   "@babel/preset-env",
                   {
-                    targets: ">0.25%",
+                    targets: {
+                      browsers: [
+                        "last 2 Chrome versions",
+                        "not Chrome < 60",
+                        "last 2 Firefox versions",
+                        "last 2 Safari versions",
+                        "not Safari < 10.1"
+                      ]
+                    },
                     modules: false
                   }
                 ],
