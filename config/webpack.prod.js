@@ -2,6 +2,13 @@ const path = require("path");
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const dotenv = require("dotenv");
+
+const env = dotenv.config().parsed;
+const envKeys = Object.keys(env).reduce((prev, next) => {
+  prev[`process.env.${next}`] = JSON.stringify(env[next]);
+  return prev;
+}, {});
 
 module.exports = {
   mode: "production",
@@ -92,7 +99,8 @@ module.exports = {
   plugins: [
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify("production"),
-      "process.env.BABEL_ENV": JSON.stringify("production")
+      "process.env.BABEL_ENV": JSON.stringify("production"),
+      ...envKeys
     }),
     new webpack.NoEmitOnErrorsPlugin(),
     new MiniCssExtractPlugin({
