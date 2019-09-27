@@ -27,7 +27,7 @@ export const loadingStatus = {
   continue: 1
 };
 
-const initialState = {
+const galleryInitialState = {
   page: 0,
   photos: [],
   status: loadingStatus.continue,
@@ -98,8 +98,8 @@ export function fetchPhotos(params) {
     debugLog("fetching");
     dispatch(requestPhotos(name));
 
-    const { page, params: params2 } = getState().gallery.galleries[name];
-    params = { ...params2, ...params, page };
+    const { page, params: stateParams } = getState().gallery.galleries[name];
+    params = { ...stateParams, ...params, page };
 
     try {
       debugLog(`${url}${api[mode].path}/?${qs.encode(params)}`);
@@ -117,7 +117,7 @@ export function fetchPhotos(params) {
   };
 }
 
-function gallery(state = initialState, action) {
+function gallery(state = galleryInitialState, action) {
   switch (action.type) {
     case REQUEST_PHOTOS:
       return { ...state, page: state.page + 1, status: loadingStatus.loading };
