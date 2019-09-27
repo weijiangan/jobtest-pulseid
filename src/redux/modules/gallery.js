@@ -37,6 +37,7 @@ const initialState = {
 const INIT_GALLERY = "INIT_GALLERY";
 const REQUEST_PHOTOS = "REQUEST_PHOTOS";
 const RECEIVE_PHOTOS = "RECEIVE_PHOTOS";
+const FETCH_END = "FETCH_END";
 const FETCH_ERROR = "FETCH_ERROR";
 const SET_ALL_ORDER = "SET_ALL_ORDER";
 
@@ -76,6 +77,13 @@ export function fetchError(name) {
   };
 }
 
+export function fetchEnd(name) {
+  return {
+    type: FETCH_END,
+    name
+  };
+}
+
 const url = "https://api.unsplash.com";
 const api = {
   all: { path: "/photos", shape: i => i },
@@ -96,12 +104,15 @@ export function fetchPhotos(params) {
     try {
       debugLog(`${url}${api[mode].path}/?${qs.encode(params)}`);
       const res = await fetch(`${url}${api[mode].path}/?${qs.encode(params)}`);
-      const data = await res.json();
-      dispatch(receivePhotos(name, api[mode].shape(data)));
+      const data = api[mode].shape(await res.json());
+      if (!data.length) {
+        dispatch(fetchEnd(name));
+      } else {
+        dispatch(receivePhotos(name, data));
+      }
     } catch (error) {
       dispatch(fetchError(name));
-      console.log(error);
-      alert("ERRO ERRO");
+      debugLog(error);
     }
   };
 }
@@ -118,6 +129,8 @@ function gallery(state = initialState, action) {
       };
     case FETCH_ERROR:
       return { ...state, page: state.page - 1, status: loadingStatus.error };
+    case FETCH_END:
+      return { ...state, page: state.page - 1, status: loadingStatus.end };
     case INIT_GALLERY:
     default:
       return state;
@@ -134,6 +147,8 @@ function galleries(
     case INIT_GALLERY:
     case REQUEST_PHOTOS:
     case RECEIVE_PHOTOS:
+    case FETCH_END:
+    case FETCH_ERROR:
       return {
         ...state,
         [action.name]: gallery(state[action.name], action)
