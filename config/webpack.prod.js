@@ -27,6 +27,7 @@ module.exports = {
               cacheDirectory: true,
               babelrc: false,
               plugins: [
+                "react-remove-properties",
                 "@babel/plugin-syntax-dynamic-import",
                 ["@babel/plugin-proposal-class-properties", { loose: false }]
               ],
