@@ -97,7 +97,7 @@ function Gallery({ gallery, ...props }) {
         </div>
       </div>
       <div className={styles.container} style={{ marginTop: "7.15rem" }}>
-        <PhotoGrid photos={selectedGallery.photos || []} />
+        <PhotoGrid photos={selectedGallery.photos} />
       </div>
       {selectedGallery.status === loadingStatus.loading && (
         <div className={styles.loadingArea}>Loading...</div>

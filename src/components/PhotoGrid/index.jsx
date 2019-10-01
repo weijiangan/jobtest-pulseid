@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styles from "./styles.css";
 
-function PhotoGrid({ photos }) {
+function PhotoGrid({ photos = [] }) {
   return (
     <div className={styles.row} data-testid="grid">
       {photos.map(photo => {
