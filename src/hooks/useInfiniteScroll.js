@@ -1,4 +1,7 @@
 import { useEffect } from "react";
+import { throttle } from "../utils";
+
+throttle("scroll", "optimizedScroll");
 
 function useInfiniteScroll({ isLoading, triggerHeight = 500 }, callback) {
   function handleSrollEnd() {
