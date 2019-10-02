@@ -13,16 +13,7 @@ function mapStateToProps(state) {
   };
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    initGallery: n => dispatch(initGallery(n)),
-    fetchPhotos: p => dispatch(fetchPhotos(p)),
-    selectMode: m => dispatch(selectMode(m)),
-    setAllOrder: o => dispatch(setAllOrder(o))
-  };
-}
-
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
+  { initGallery, fetchPhotos, selectMode, setAllOrder }
 )(AuthScreen);

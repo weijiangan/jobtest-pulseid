@@ -8,12 +8,7 @@ function mapStateToProps(state) {
   };
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    selectMode: m => dispatch(selectMode(m))
-  };
-}
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
+  { selectMode }
 )(Nav);
