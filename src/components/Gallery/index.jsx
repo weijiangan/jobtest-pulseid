@@ -13,10 +13,16 @@ const sortOptions = ["latest", "oldest", "popular"];
 const SEARCH_DB_TIMEOUT = 500;
 const INFINITE_DB_TIMEOUT = 75;
 
+const galleryMode = {
+  all: "all",
+  search: "search"
+};
+
 function Gallery({ gallery, ...props }) {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDbQuery] = useDebounce(query, SEARCH_DB_TIMEOUT);
-  const galleryName = gallery.selectedMode === "all" ? "all" : debouncedQuery;
+  const galleryName =
+    gallery.selectedMode === galleryMode.all ? galleryMode.all : debouncedQuery;
   let selectedGallery = gallery.galleries[galleryName];
   if (!selectedGallery) {
     selectedGallery = {};
@@ -51,13 +57,14 @@ function Gallery({ gallery, ...props }) {
 
   const handleSearch = useCallback(event => {
     setQuery(event.target.value);
-    dbSelectMode("search");
+    dbSelectMode(galleryMode.search);
   });
 
   useEffect(() => {
     const cantScroll = document.body.scrollHeight < window.innerHeight;
     if (cantScroll && selectedGallery.status === loadingStatus.continue) {
-      if (gallery.selectedMode === "search" && debouncedQuery === "") return;
+      if (gallery.selectedMode === galleryMode.search && debouncedQuery === "")
+        return;
       props.fetchPhotos(params);
     }
   }, [selectedGallery]);
@@ -77,7 +84,7 @@ function Gallery({ gallery, ...props }) {
             <div className={styles.navWrapper}>
               <NavContainer query={debouncedQuery} setQuery={setDbQuery} />
             </div>
-            {gallery.selectedMode === "all" && (
+            {gallery.selectedMode === galleryMode.all && (
               <div className={styles.flexFixed}>
                 <span className={styles.mr1}>Sort by </span>
                 <Select
