@@ -5,6 +5,7 @@ import NavContainer from "../../containers/NavContainer";
 import { loadingStatus } from "../../redux/modules/gallery";
 import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
 import { useDebounce } from "../../hooks/useDebounce";
+import Select from "../Select";
 import config from "../../../config";
 import styles from "./styles.css";
 
@@ -61,22 +62,6 @@ function Gallery({ gallery, ...props }) {
     }
   }, [selectedGallery]);
 
-  const sortSelect = (
-    <div className={styles.flexFixed}>
-      <span className={styles.mr1}>Sort by </span>
-      <select
-        value={gallery.galleries.all.params.order_by}
-        onChange={e => props.setAllOrder(e.target.value)}
-      >
-        {sortOptions.map(option => (
-          <option key={option} value={option.toLowerCase()}>
-            {option}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-
   return (
     <div>
       <div className={styles.topBar}>
@@ -92,7 +77,16 @@ function Gallery({ gallery, ...props }) {
             <div className={styles.navWrapper}>
               <NavContainer query={debouncedQuery} setQuery={setDbQuery} />
             </div>
-            {gallery.selectedMode === "all" && sortSelect}
+            {gallery.selectedMode === "all" && (
+              <div className={styles.flexFixed}>
+                <span className={styles.mr1}>Sort by </span>
+                <Select
+                  value={gallery.galleries.all.params.order_by}
+                  handleChange={e => props.setAllOrder(e.target.value)}
+                  options={sortOptions}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
