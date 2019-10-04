@@ -1,9 +1,6 @@
 import { useEffect } from "react";
-import { throttle } from "../utils";
 
-throttle("scroll", "optimizedScroll");
-
-function useInfiniteScroll({ isLoading, triggerHeight = 500 }, callback) {
+function useInfiniteScroll({ isLoading, triggerHeight = 500, ref }, callback) {
   function handleSrollEnd() {
     const maxScrollPosition = document.body.scrollHeight - window.innerHeight;
     const nearEnd = window.scrollY > maxScrollPosition - triggerHeight;
@@ -13,9 +10,9 @@ function useInfiniteScroll({ isLoading, triggerHeight = 500 }, callback) {
   }
 
   useEffect(() => {
-    window.addEventListener("optimizedScroll", handleSrollEnd, false);
+    window.addEventListener("scroll", handleSrollEnd, false);
     return () => {
-      window.removeEventListener("optimizedScroll", handleSrollEnd, false);
+      window.removeEventListener("scroll", handleSrollEnd, false);
     };
   });
 }
