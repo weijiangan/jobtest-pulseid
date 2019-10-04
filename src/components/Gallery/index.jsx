@@ -21,6 +21,8 @@ function Gallery({ selectedGallery, ...props }) {
     props.initGallery(props.query);
   }
 
+  const galleryRef = React.useRef();
+
   // scroll events fire very often and sometimes component doesn't rerender
   // quick enough to receive new prop for loading status
   const nextPage = useDebounceCallback(props.fetchPhotos, INFINITE_DB_TIMEOUT, {
@@ -29,26 +31,31 @@ function Gallery({ selectedGallery, ...props }) {
   });
 
   useInfiniteScroll(
-    { isLoading: selectedGallery.status !== loadingStatus.continue },
+    {
+      isLoading: selectedGallery.status !== loadingStatus.continue,
+      ref: galleryRef.current,
+      triggerHeight: 300
+    },
     () => nextPage(params)
   );
 
   useEffect(() => {
-    const cantScroll = document.body.scrollHeight < window.innerHeight;
+    const elem = galleryRef.current;
+    const cantScroll = elem.offsetHeight === elem.scrollHeight;
     if (cantScroll) {
       props.fetchPhotos(params);
     }
-  }, [selectedGallery]);
+  }, [selectedGallery, galleryRef]);
 
   return (
-    <div>
+    <div className={styles.galleryWrapper}>
       <TopBar />
-      <div className={theme.container} style={{ paddingTop: "7.15rem" }}>
+      <div ref={galleryRef} className={styles.gridContainer}>
         <PhotoGrid photos={selectedGallery.photos} />
+        {selectedGallery.status === loadingStatus.loading && (
+          <div className={styles.loadingArea}>Loading...</div>
+        )}
       </div>
-      {selectedGallery.status === loadingStatus.loading && (
-        <div className={styles.loadingArea}>Loading...</div>
-      )}
     </div>
   );
 }
