@@ -1,18 +1,26 @@
 import { useEffect } from "react";
 
-function useInfiniteScroll({ isLoading, triggerHeight = 500, ref }, callback) {
+function useInfiniteScroll(
+  { isLoading, triggerHeight = 500, ref = window },
+  callback
+) {
   function handleSrollEnd() {
-    const maxScrollPosition = document.body.scrollHeight - window.innerHeight;
-    const nearEnd = window.scrollY > maxScrollPosition - triggerHeight;
+    const maxScrollPosition =
+      ref === window
+        ? document.body.scrollHeight - window.innerHeight
+        : ref.scrollHeight - ref.offsetHeight;
+    const nearEnd =
+      (ref === window ? window.scrollY : ref.scrollTop) >=
+      maxScrollPosition - triggerHeight;
     if (nearEnd && !isLoading) {
       callback();
     }
   }
 
   useEffect(() => {
-    window.addEventListener("scroll", handleSrollEnd, false);
+    ref.addEventListener("scroll", handleSrollEnd, false);
     return () => {
-      window.removeEventListener("scroll", handleSrollEnd, false);
+      ref.removeEventListener("scroll", handleSrollEnd, false);
     };
   });
 }
