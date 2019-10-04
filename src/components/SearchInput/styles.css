@@ -1,3 +1,10 @@
 .searchBox {
   composes: mb1 from "../../css/app.css";
 }
+
+@media (max-width: 575.98px) {
+  input[type="text"].searchBox {
+    width: 100%;
+    border-radius: 0.875rem;
+  }
+}
