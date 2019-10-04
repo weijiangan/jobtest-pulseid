@@ -43,7 +43,7 @@ function Gallery({ selectedGallery, ...props }) {
   return (
     <div>
       <TopBar />
-      <div className={theme.container} style={{ marginTop: "7.15rem" }}>
+      <div className={theme.container} style={{ paddingTop: "7.15rem" }}>
         <PhotoGrid photos={selectedGallery.photos} />
       </div>
       {selectedGallery.status === loadingStatus.loading && (
