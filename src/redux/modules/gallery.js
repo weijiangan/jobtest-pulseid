@@ -1,4 +1,5 @@
 import { combineReducers } from "redux";
+import { createSelector } from "reselect";
 import qs from "querystring";
 import { debugLog } from "../../utils";
 
@@ -11,7 +12,12 @@ export function selectMode(mode) {
   };
 }
 
-function selectedMode(state = "all", action) {
+export const galleryMode = {
+  all: "all",
+  search: "search"
+};
+
+function selectedMode(state = galleryMode.all, action) {
   switch (action.type) {
     case SELECT_MODE:
       return action.mode;
@@ -20,20 +26,23 @@ function selectedMode(state = "all", action) {
   }
 }
 
-// only load if > 0
-export const loadingStatus = {
-  loading: -2,
-  error: -1,
-  end: 0,
-  continue: 1
-};
+const SET_QUERY = "SET_QUERY";
 
-const galleryInitialState = {
-  page: 0,
-  photos: [],
-  status: loadingStatus.continue,
-  params: {}
-};
+export function setQuery(query) {
+  return {
+    type: SET_QUERY,
+    query
+  };
+}
+
+function query(state = "", action) {
+  switch (action.type) {
+    case SET_QUERY:
+      return action.query;
+    default:
+      return state;
+  }
+}
 
 const INIT_GALLERY = "INIT_GALLERY";
 const REQUEST_PHOTOS = "REQUEST_PHOTOS";
@@ -93,14 +102,23 @@ const api = {
 
 export function fetchPhotos(params) {
   return async (dispatch, getState) => {
-    const { selectedMode: mode } = getState().gallery;
-    const name = mode === "all" ? mode : params.query;
+    let state = getState();
+    const mode = getSelectedMode(state);
+    const query = getQuery(state);
+    const name = mode === galleryMode.all ? mode : query;
+
+    if (
+      getGalleries(state)[name].status !== loadingStatus.continue ||
+      (mode === galleryMode.search && query === "")
+    )
+      return;
 
     debugLog("fetching");
     dispatch(requestPhotos(name));
 
-    const { page, params: stateParams } = getState().gallery.galleries[name];
+    const { page, params: stateParams } = getGalleries(getState())[name];
     params = { ...stateParams, ...params, page };
+    if (mode === galleryMode.search) params.query = query;
 
     try {
       debugLog(`${url}${api[mode].path}/?${qs.encode(params)}`);
@@ -117,6 +135,21 @@ export function fetchPhotos(params) {
     }
   };
 }
+
+// only load if > 0
+export const loadingStatus = {
+  loading: -2,
+  error: -1,
+  end: 0,
+  continue: 1
+};
+
+const galleryInitialState = {
+  page: 0,
+  photos: [],
+  status: loadingStatus.continue,
+  params: {}
+};
 
 function gallery(state = galleryInitialState, action) {
   switch (action.type) {
@@ -169,7 +202,31 @@ function galleries(
   }
 }
 
+export function getSelectedMode(state) {
+  return state.gallery.selectedMode;
+}
+
+export function getGalleries(state) {
+  return state.gallery.galleries;
+}
+
+export function getQuery(state) {
+  return state.gallery.query;
+}
+
+export const selectSelectedGallery = createSelector(
+  getSelectedMode,
+  getGalleries,
+  getQuery,
+  (selectedMode, galleries, query) => {
+    return selectedMode === galleryMode.all
+      ? galleries[selectedMode]
+      : galleries[query];
+  }
+);
+
 export default combineReducers({
   selectedMode,
+  query,
   galleries
 });

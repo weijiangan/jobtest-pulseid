@@ -3,13 +3,11 @@ import styles from "./styles.css";
 
 const tags = ["People", "Nature", "Skyline", "Abstract", "Animals", "Travel"];
 
-function Nav({ query, setQuery, gallery, ...props }) {
-  const { selectedMode } = gallery;
-
+function Nav({ query, setQuery, selectedMode, selectMode }) {
   return (
     <ul className={styles.nav} data-testid="entries">
       <li className={selectedMode === "all" ? styles.active : undefined}>
-        <button type="button" onClick={() => props.selectMode("all")}>
+        <button type="button" onClick={() => selectMode("all")}>
           All
         </button>
       </li>
@@ -26,7 +24,7 @@ function Nav({ query, setQuery, gallery, ...props }) {
           <button
             type="button"
             onClick={() => {
-              props.selectMode("search");
+              selectMode("search");
               setQuery(tag.toLowerCase());
             }}
           >

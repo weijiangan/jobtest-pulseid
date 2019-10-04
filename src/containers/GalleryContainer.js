@@ -3,17 +3,20 @@ import {
   initGallery,
   fetchPhotos,
   selectMode,
-  setAllOrder
+  setAllOrder,
+  selectSelectedGallery,
+  getQuery
 } from "../redux/modules/gallery";
 import AuthScreen from "../components/Gallery";
 
 function mapStateToProps(state) {
   return {
-    gallery: state.gallery
+    selectedGallery: selectSelectedGallery(state),
+    query: getQuery(state)
   };
 }
 
 export default connect(
   mapStateToProps,
-  { initGallery, fetchPhotos, selectMode, setAllOrder }
+  { initGallery, fetchPhotos }
 )(AuthScreen);

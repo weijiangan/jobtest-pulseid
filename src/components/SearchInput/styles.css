@@ -1,0 +1,3 @@
+.searchBox {
+  composes: mb1 from "../../css/app.css";
+}

@@ -1,15 +1,9 @@
-import Nav from "../components/Nav";
 import { connect } from "react-redux";
-import {
-  selectMode,
-  getSelectedMode,
-  getQuery,
-  setQuery
-} from "../redux/modules/gallery";
+import { selectMode, setQuery, getQuery } from "../redux/modules/gallery";
+import SearchInput from "../components/SearchInput";
 
 function mapStateToProps(state) {
   return {
-    selectedMode: getSelectedMode(state),
     query: getQuery(state)
   };
 }
@@ -17,4 +11,4 @@ function mapStateToProps(state) {
 export default connect(
   mapStateToProps,
   { selectMode, setQuery }
-)(Nav);
+)(SearchInput);

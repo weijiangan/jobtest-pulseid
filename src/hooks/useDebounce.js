@@ -1,18 +1,6 @@
-import { useState, useEffect } from "react";
+import { useCallback } from "react";
+import { debounce } from "lodash";
 
-export function useDebounce(value, delay) {
-  // State and setters for debounced value
-  const [debouncedValue, setDebouncedValue] = useState(value);
-  useEffect(
-    () => {
-      const handler = setTimeout(() => {
-        setDebouncedValue(value);
-      }, delay);
-      return () => {
-        clearTimeout(handler);
-      };
-    },
-    [value, delay] // Only re-call effect if value or delay changes
-  );
-  return [debouncedValue, setDebouncedValue];
+export function useDebounceCallback(...args) {
+  return useCallback(debounce(...args), []);
 }

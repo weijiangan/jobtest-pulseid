@@ -1,103 +1,49 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { debounce } from "lodash";
+import React, { useEffect, useCallback } from "react";
+import { useDebounceCallback } from "../../hooks/useDebounce";
+import TopBar from "../../containers/TopBarContainer";
 import PhotoGrid from "../PhotoGrid";
-import NavContainer from "../../containers/NavContainer";
-import { loadingStatus } from "../../redux/modules/gallery";
+import { loadingStatus, galleryMode } from "../../redux/modules/gallery";
 import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
-import { useDebounce } from "../../hooks/useDebounce";
-import Select from "../Select";
 import config from "../../../config";
+import theme from "../../css/app.css";
 import styles from "./styles.css";
 
-const sortOptions = ["latest", "oldest", "popular"];
-const SEARCH_DB_TIMEOUT = 500;
 const INFINITE_DB_TIMEOUT = 75;
 
-const galleryMode = {
-  all: "all",
-  search: "search"
+const params = {
+  client_id: config.clientId,
+  per_page: 12
 };
 
-function Gallery({ gallery, ...props }) {
-  const [query, setQuery] = useState("");
-  const [debouncedQuery, setDbQuery] = useDebounce(query, SEARCH_DB_TIMEOUT);
-  const galleryName =
-    gallery.selectedMode === galleryMode.all ? galleryMode.all : debouncedQuery;
-  let selectedGallery = gallery.galleries[galleryName];
+function Gallery({ selectedGallery, ...props }) {
   if (!selectedGallery) {
     selectedGallery = {};
-    props.initGallery(debouncedQuery);
+    props.initGallery(props.query);
   }
 
-  const params = {
-    client_id: config.clientId,
-    per_page: 12,
-    query: debouncedQuery || undefined
-  };
-
-  const nextPage = useCallback(
-    // scroll events fire very often and sometimes component doesn't rerender
-    // quick enough to receive new prop for loading status
-    debounce(props.fetchPhotos, INFINITE_DB_TIMEOUT, {
-      leading: true,
-      trailing: false
-    }),
-    [props.fetchPhotos]
-  );
+  // scroll events fire very often and sometimes component doesn't rerender
+  // quick enough to receive new prop for loading status
+  const nextPage = useDebounceCallback(props.fetchPhotos, INFINITE_DB_TIMEOUT, {
+    leading: true,
+    trailing: false
+  });
 
   useInfiniteScroll(
     { isLoading: selectedGallery.status !== loadingStatus.continue },
     () => nextPage(params)
   );
 
-  const dbSelectMode = useCallback(
-    debounce(props.selectMode, SEARCH_DB_TIMEOUT),
-    []
-  );
-
-  const handleSearch = useCallback(event => {
-    setQuery(event.target.value);
-    dbSelectMode(galleryMode.search);
-  });
-
   useEffect(() => {
     const cantScroll = document.body.scrollHeight < window.innerHeight;
-    if (cantScroll && selectedGallery.status === loadingStatus.continue) {
-      if (gallery.selectedMode === galleryMode.search && debouncedQuery === "")
-        return;
+    if (cantScroll) {
       props.fetchPhotos(params);
     }
   }, [selectedGallery]);
 
   return (
     <div>
-      <div className={styles.topBar}>
-        <div className={styles.container}>
-          <input
-            className={styles.searchBox}
-            type="text"
-            value={query}
-            onChange={handleSearch}
-            placeholder="Search images..."
-          />
-          <div className={styles.flexBaseline}>
-            <div className={styles.navWrapper}>
-              <NavContainer query={debouncedQuery} setQuery={setDbQuery} />
-            </div>
-            {gallery.selectedMode === galleryMode.all && (
-              <div className={styles.flexFixed}>
-                <span className={styles.mr1}>Sort by </span>
-                <Select
-                  value={gallery.galleries.all.params.order_by}
-                  handleChange={e => props.setAllOrder(e.target.value)}
-                  options={sortOptions}
-                />
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-      <div className={styles.container} style={{ marginTop: "7.15rem" }}>
+      <TopBar />
+      <div className={theme.container} style={{ marginTop: "7.15rem" }}>
         <PhotoGrid photos={selectedGallery.photos} />
       </div>
       {selectedGallery.status === loadingStatus.loading && (

@@ -1,20 +1,19 @@
-import Nav from "../components/Nav";
 import { connect } from "react-redux";
 import {
-  selectMode,
+  setAllOrder,
   getSelectedMode,
-  getQuery,
-  setQuery
+  getGalleries
 } from "../redux/modules/gallery";
+import TopBar from "../components/TopBar";
 
 function mapStateToProps(state) {
   return {
     selectedMode: getSelectedMode(state),
-    query: getQuery(state)
+    allOrderBy: getGalleries(state).all.params.order_by
   };
 }
 
 export default connect(
   mapStateToProps,
-  { selectMode, setQuery }
-)(Nav);
+  { setAllOrder }
+)(TopBar);
