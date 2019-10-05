@@ -41,7 +41,7 @@ function Gallery({ selectedGallery, ...props }) {
 
   useEffect(() => {
     const elem = galleryRef.current;
-    const cantScroll = elem.offsetHeight === elem.scrollHeight;
+    const cantScroll = elem.scrollHeight <= elem.offsetHeight;
     if (cantScroll) {
       props.fetchPhotos(params);
     }
